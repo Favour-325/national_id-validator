@@ -8,6 +8,7 @@ class Citizen(BaseModel):
     date_of_birth: date
     gender: Gender
     region: str
+    nationality: str
 
     class Config:
         from_atrributes = True

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, APIRouter
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -8,18 +8,21 @@ app = FastAPI(
     title="National ID Validator"
 )
 
-router = APIRouter(
-    tags=["Validator"],
-    prefix="/validate"
-)
 
-@app.get('/')
-def root():
-    return "Welcome to the home page"
+@app.get('/', response_model=list[schemas.CitizenRead])
+def get_all(db: Session = Depends(get_db)):
+    return db.query(models.Citizen).all()
+
 
 @app.post('/', response_model=schemas.CitizenRead)
-def validate(data: schemas.Citizen, db: Session = Depends(get_db)):
-    id_number = data.id_number
+def validate(data: str, db: Session = Depends(get_db)):
+    id_number = data
+    db_data = db.query(models.Citizen).filter(models.Citizen.id_number==id_number).first()
+
+    if db_data == None:
+        raise HTTPException(status_code=404, detail="No registered ID found with this ID Number")
+    
+    return db_data
 
 
 @app.post("/create", response_model=schemas.CitizenRead)
