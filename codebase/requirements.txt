@@ -1,1 +1,6 @@
-fastapi
+fastapi[standard]
+pydantic
+sqlalchemy
+alembic
+python-multipart
+python-dotenv
