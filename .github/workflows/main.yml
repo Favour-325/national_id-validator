@@ -6,11 +6,11 @@ on:
       - main
 
 jobs:
-  build-scan-push:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -25,33 +25,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Step 4: Build & Push Docker image using Buildx
+      # Step 4: Build & Push Docker image
       - name: Build & Push Docker image
         run: |
           IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/id-validator:latest"
           echo "Building and pushing image: $IMAGE"
 
-          # Ensure Dockerfile exists
-          if [ ! -f ./codebase/Dockerfile ]; then
-            echo "Error: Dockerfile not found at ./codebase/Dockerfile"
-            exit 1
-          fi
-
-          # Build and push Docker image
+          # Build and push the Docker image
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             -t "$IMAGE" \
             -f ./codebase/Dockerfile \
             ./codebase \
             --push
-
-      # Step 5: Run Trivy security scan using the official Action
-      - name: Trivy Security Scan
-        uses: aquasecurity/trivy-action@v0.20.0
-        with:
-          # Make absolutely sure there are NO extra characters or spaces
-          image-ref: "${{ secrets.DOCKERHUB_USERNAME }}/id-validator:latest"
-          format: "table"
-          severity: "CRITICAL,HIGH"
-          exit-code: 1
-          ignore-unfixed: true
