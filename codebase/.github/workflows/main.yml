@@ -9,28 +9,36 @@ jobs:
   build-scan-push:
     runs-on: ubuntu-latest
     env:
-      # Sanitize the username secret to remove any newlines/CR and build the image name
+      # Build the full image name using sanitized Docker Hub username
       IMAGE: ${{ format('{0}/id-validator:latest', replace(replace(secrets.DOCKERHUB_USERNAME, '\n', ''), '\r', '')) }}
 
     steps:
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Step 2: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Step 3: Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          # Pass a sanitized username to avoid embedded newline/CR breaking shell commands
           username: ${{ replace(replace(secrets.DOCKERHUB_USERNAME, '\n', ''), '\r', '') }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker image
+      # Step 4: Build and push Docker image using Buildx
+      - name: Build & Push Docker image
         run: |
-          # Explicitly provide Dockerfile path and build context to avoid ambiguous/line-broken commands
-          docker build -t "$IMAGE" -f ./codebase/Dockerfile ./codebase
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t "$IMAGE" \
+            -f ./codebase/Dockerfile \
+            ./codebase \
+            --push
 
+      # Step 5: Run Trivy Security Scan
       - name: Trivy Security Scan
         uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -38,8 +46,3 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: 1
           ignore-unfixed: true
-
-      - name: Push Docker image
-        if: success()
-        run: |
-          docker push "$IMAGE"
