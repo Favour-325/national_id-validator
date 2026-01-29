@@ -16,10 +16,10 @@ def get_all(db: Session = Depends(get_db)):
 
 
 @app.post('/')
-def validate(data: str, db: Session = Depends(get_db)):
-    id_number = data
+def validate(data: schemas.ValidationRequest, db: Session = Depends(get_db)):
+    id_number = data.id_number
 
-    if re.match(r"^CAM-\d{6}", id_number):
+    if re.match(r"^CAM-\d{6}$", id_number):
         db_data = db.query(models.Citizen).filter(models.Citizen.id_number==id_number).first()
         
         if db_data == None:

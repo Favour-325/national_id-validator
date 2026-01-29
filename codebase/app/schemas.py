@@ -1,6 +1,11 @@
+from typing import Optional
 from pydantic import BaseModel
 from datetime import date
 from .models import Gender
+
+
+class ValidationRequest(BaseModel):
+    id_number: str
 
 
 class Citizen(BaseModel):
@@ -9,7 +14,7 @@ class Citizen(BaseModel):
     date_of_birth: date
     gender: Gender
     region: str
-    nationality: str
+    nationality: Optional[str] = "Cameroonian"
 
     class Config:
         orm_mode = True
