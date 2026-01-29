@@ -9,7 +9,7 @@ jobs:
   build-scan-push:
     runs-on: ubuntu-latest
     env:
-      # Build the full image name using sanitized Docker Hub username
+      # Sanitize Docker Hub username and construct image name
       IMAGE: ${{ format('{0}/id-validator:latest', replace(replace(secrets.DOCKERHUB_USERNAME, '\n', ''), '\r', '')) }}
 
     steps:
@@ -17,20 +17,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Docker Buildx
+      # Step 2: Debug - list all files to ensure paths exist
+      - name: List repo files for debugging
+        run: ls -R
+
+      # Step 3: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 3: Login to Docker Hub
+      # Step 4: Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ replace(replace(secrets.DOCKERHUB_USERNAME, '\n', ''), '\r', '') }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Step 4: Build and push Docker image using Buildx
+      # Step 5: Build & push Docker image using Buildx
       - name: Build & Push Docker image
         run: |
+          # Make sure the build context exists
+          if [ ! -f ./codebase/Dockerfile ]; then
+            echo "Error: Dockerfile not found at ./codebase/Dockerfile"
+            exit 1
+          fi
+
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             -t "$IMAGE" \
@@ -38,7 +48,7 @@ jobs:
             ./codebase \
             --push
 
-      # Step 5: Run Trivy Security Scan
+      # Step 6: Run Trivy security scan on the pushed image
       - name: Trivy Security Scan
         uses: aquasecurity/trivy-action@0.20.0
         with:
