@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
-from models import Gender
+from .models import Gender
+
 
 class Citizen(BaseModel):
     id_number: str
@@ -11,7 +12,8 @@ class Citizen(BaseModel):
     nationality: str
 
     class Config:
-        from_atrributes = True
+        orm_mode = True
+
 
 class CitizenRead(Citizen):
     is_active: bool
