@@ -28,7 +28,7 @@ jobs:
       # Step 3: Build the Docker image (local only)
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/id-validator:latest ./codebase -f ./codebase/Dockerfile
+          docker buildx build -f ./codebase/Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/id-validator:latest ./codebase
 
       # Step 4: Security Scan with Trivy
       - name: Trivy Security Scan
