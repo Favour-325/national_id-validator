@@ -25,10 +25,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Step 3: Build the Docker image (local only)
+      # Step 3: Build the Docker image (fixed: options before context)
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/id-validator:latest .
+          # Place -f (Dockerfile) before the build context to satisfy buildx requirements
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/id-validator:latest -f ./codebase/Dockerfile ./codebase
 
       # Step 4: Security Scan with Trivy
       - name: Trivy Security Scan
