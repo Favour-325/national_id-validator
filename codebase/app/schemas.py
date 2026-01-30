@@ -14,10 +14,10 @@ class Citizen(BaseModel):
     date_of_birth: date
     gender: Gender
     region: str
-    nationality: Optional[str] = "Cameroonian"
+    nationality: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CitizenRead(Citizen):
