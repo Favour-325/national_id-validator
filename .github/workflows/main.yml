@@ -2,7 +2,7 @@ name: rCI National ID Validator
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "Test" ]
 
 jobs:
   build-and-scan:
