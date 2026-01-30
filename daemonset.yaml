@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: id-validator
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: id-validator
+  template:
+    metadata:
+      labels:
+        app: id-validator
+    spec:
+      nodeSelector:
+        office: branch
+      containers:
+      - name: validator
+        image: wingobery/id-validator:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          hostPort: 8000
