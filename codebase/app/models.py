@@ -22,5 +22,5 @@ class Citizen(Base):
     date_of_birth = Column(Date, nullable=False)
     gender = Column(Enum(Gender), nullable=False)
     region = Column(String, nullable=False)
-    nationality = Column(String, nullable=False, default="Cameroonian")
+    nationality = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)

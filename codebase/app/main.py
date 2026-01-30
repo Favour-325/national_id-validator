@@ -23,7 +23,7 @@ def validate(data: schemas.ValidationRequest, db: Session = Depends(get_db)):
         db_data = db.query(models.Citizen).filter(models.Citizen.id_number==id_number).first()
         
         if db_data == None:
-            raise HTTPException(status_code=404, detail="No ID found with this ID Number")
+            raise HTTPException(status_code=404, detail="ID does not exist")
         
         return {"Response": "Valid ID"}
 
