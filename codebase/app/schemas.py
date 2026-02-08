@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
 from datetime import date
-from .models import Gender
+from models import Gender
 
 
 class ValidationRequest(BaseModel):
